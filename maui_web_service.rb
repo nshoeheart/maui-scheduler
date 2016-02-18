@@ -5,11 +5,11 @@ require_relative 'models/maui/session'
 
 class MauiWebService < MauiWebServiceUtil
 	# Returns an array of Session objects
-	def self.getSessions(previous, future)
-		sessionHash = get "/pub/registrar/sessions/bounded?previous=#{previous}&future=#{future}"
+	def self.get_sessions(previous, future)
+		session_hash = get "/pub/registrar/sessions/bounded?previous=#{previous}&future=#{future}"
 		
 		sessions = []
-		sessionHash.each{ |hash|
+		session_hash.each{ |hash|
 			session = Session.new(hash)
 			sessions << session
 		}
@@ -18,20 +18,20 @@ class MauiWebService < MauiWebServiceUtil
 	end
 
 	# Returns an array of CourseSubject objects
-	def self.getCourseSubjects
-		csHash = get "/pub/lookups/registrar/coursesubjects"
+	def self.get_course_subjects
+		cs_hash = get "/pub/lookups/registrar/coursesubjects"
 		
-		courseSubjects = []
-		csHash.each{ |hash| 
-			courseSubject = CourseSubject.new(hash)
-			courseSubjects << courseSubject
+		course_subjects = []
+		cs_hash.each{ |hash| 
+			course_subject = CourseSubject.new(hash)
+			course_subjects << course_subject
 		}
 
-		return courseSubjects
+		return course_subjects
 	end
 
 	# Returns an array of course numbers
-	def self.getCourses(sessionCode, courseSubject)
+	def self.get_courses(sessionCode, courseSubject)
 		courses = get "/pub/registrar/course/dropdown/#{sessionCode}/#{courseSubject}"
 
 		return courses
