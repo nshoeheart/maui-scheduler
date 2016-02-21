@@ -1,7 +1,7 @@
 require 'rest-client'
 require 'json'
 
-require_relative 'lib/extensions/time_extensions'
+require_relative '../lib/extensions/time_extensions'
 
 class MauiWebServiceUtil
 	@@base_url = 'https://api.maui.uiowa.edu/maui/api'

@@ -15,29 +15,16 @@ class CourseSubject
 	include HashConstructor
 
 	def to_str
-		puts "Course Subject:"
-		puts "ID = #{id}"
-		puts "Natural Key = #{naturalKey}"
-		puts "Sort Order = #{sortOrder}"
-		puts "Short Description = #{shortDescription}"
-		puts "Web Description = #{webDescription}"
-		puts "Description = #{description}"
-		puts "Additional Info = #{additionalInfo}"
-		puts "Additional Info 1 = #{additionalInfo1}"
-		puts "Additional Info 2 = #{additionalInfo2}"
-		puts "Additional Info 3 = #{additionalInfo3}"
+		return ("Course Subject:\n" +
+				"ID = #{id}\n" +
+				"Natural Key = #{naturalKey}\n" +
+				"Sort Order = #{sortOrder}\n" +
+				"Short Description = #{shortDescription}\n" +
+				"Web Description = #{webDescription}\n" +
+				"Description = #{description}\n" +
+				"Additional Info = #{additionalInfo}\n" +
+				"Additional Info 1 = #{additionalInfo1}\n" +
+				"Additional Info 2 = #{additionalInfo2}\n" +
+				"Additional Info 3 = #{additionalInfo3}")
 	end
-
-	#def initialize(id, naturalKey, sortOrder, shortDescription, webDescription, description, additionalInfo, additionalInfo1, additionalInfo2, additionalInfo3)
-	#	@id = id
-	#	@naturalKey = naturalKey
-	#	@sortOrder = sortOrder
-	#	@shortDescription = shortDescription
-	#	@webDescription = webDescription
-	#	@description = description
-	#	@additionalInfo = additionalInfo #needs to be an object
-	#	@additionalInfo1 = additionalInfo1
-	#	@additionalInfo2 = additionalInfo2
-	#	@additionalInfo3 = additionalInfo3
-	#end
 end

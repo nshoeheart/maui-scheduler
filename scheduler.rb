@@ -1,8 +1,36 @@
-require_relative 'maui_web_service'
+require_relative 'util/maui_web_service'
 require_relative 'models/maui/course_subject'
 require_relative 'models/maui/session'
+require_relative 'models/maui/complex_section'
+require_relative 'models/maui/instructor'
 
 #------------------Helper Methods-------------------------
+def select_session(sessions)
+	puts 'Select one of the following semesters by entering its code in parentheses:'
+	sessions.each { |s| 
+		puts "\t#{s.shortDescription} (#{s.legacyCode})"
+	}
+
+	session = nil
+	session_selected = false
+
+	until session_selected
+		print 'Session Code: '
+		session = gets.chomp
+
+		sessions.each { |s|
+			if (s.legacyCode == session)
+				session_selected = true
+				puts "Selected Session: #{s.shortDescription} (#{session})"
+			end
+		}
+
+		puts 'Invalid Session Code' unless session_selected
+	end
+
+	return session
+end
+
 def select_course_subject(cs_hash)
 	course_subject = nil
 	done_selecting_cs = false
@@ -27,10 +55,11 @@ end
 
 def select_courses(courses)
 	puts "\nAdd courses one at a time from one of the following course numbers. When you are done adding courses for this subject, enter 'done'"
-	courses.each{ |course| 
-		print "#{course}, "
+	courses.each_with_index { |course, i| 
+		print "#{course}"
+		print ', ' unless i == courses.length - 1
 	}
-	puts "\n"
+	puts puts
 
 	selected_courses = []
 	course_selection = nil
@@ -56,27 +85,7 @@ end
 
 #------------Start Main Script--------------
 sessions = MauiWebService.get_sessions(2, 3)
-puts 'Select one of the following semesters by entering its code in parentheses:'
-sessions.each { |s| 
-	puts "\t#{s.shortDescription} (#{s.legacyCode})"
-}
-
-session = nil
-session_selected = false
-
-until session_selected
-	print 'Session Code: '
-	session = gets.chomp
-
-	sessions.each { |s|
-		if (s.legacyCode == session)
-			session_selected = true
-			puts "Selected Session: #{s.shortDescription} (#{session})"
-		end
-	}
-
-	puts 'Invalid Session Code' unless session_selected
-end
+session = select_session(sessions)
 
 course_subjects = MauiWebService.get_course_subjects
 cs_hash = Hash.new
@@ -98,15 +107,38 @@ until done_adding_courses
 		courses.sort!
 
 		select_courses(courses).each { |course_num|
-			selected_courses << "#{course_subject}:#{course_num}"
+			selected_courses << {subject: course_subject, course: course_num}
 		}
 	end
 end
 
-puts "\nCourses Selected:"
-puts selected_courses
+print "\nCourses Selected: "
+selected_courses.each_with_index { |course_hash, i|
+	print "#{course_hash[:subject]}:#{course_hash[:course]}"
+	print ', ' unless i == selected_courses.length - 1
+}
+puts puts
+
+puts 'Getting date and time info...'
+
+sections = []
+# create array inside array for each group of sections
+selected_courses.each { |course_hash|
+	sections << MauiWebService.get_complex_sections(session, course_hash[:subject], course_hash[:course])
+}
+
+sections.each { |sectionGroup|
+	sectionGroup.each { |section|
+		puts "\n\nCourse: #{section.subjectCourse} - #{section.courseTitle}"
+		section.timeAndLocations.each { |tal|
+			puts "\n#{tal.to_str}"
+		}
+		section.instructors.each { |inst|
+			puts "\n#{inst.to_str}"
+		}
+	}
+}
 
 #todo get dates/times information
 
 #------------END OF MAIN SCRIPT-------------------------
-

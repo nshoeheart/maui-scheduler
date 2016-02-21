@@ -10,19 +10,11 @@ class Session
 	include HashConstructor
 
 	def to_str
-		puts "Session:"
-		puts "ID = #{id}"
-		puts "Start Date = #{startDate}"
-		puts "End Date = #{endDate}"
-		puts "Short Description = #{shortDescription}"
-		puts "Legacy Code = #{legacyCode}"
+		return ("Session:\n" +
+				"ID = #{id}\n" +
+				"Start Date = #{startDate}\n" +
+				"End Date = #{endDate}\n" +
+				"Short Description = #{shortDescription}\n" +
+				"Legacy Code = #{legacyCode}")
 	end
-
-	#def initialize(id, startDate, endDate, shortDescription, legacyCode)
-	#	@id = id
-	#	@startDate = startDate
-	#	@endDate = endDate
-	#	@shortDescription = shortDescription
-	#	@legacyCode = legacyCode
-	#end
 end
