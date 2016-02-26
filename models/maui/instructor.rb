@@ -1,5 +1,3 @@
-
-
 class Instructor
 	attr_accessor(:id,
 				:firstName,

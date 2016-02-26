@@ -5,6 +5,8 @@ require_relative 'models/maui/complex_section'
 require_relative 'models/maui/instructor'
 
 #------------------Helper Methods-------------------------
+
+# Select a session to get courses for
 def select_session(sessions)
 	puts 'Select one of the following semesters by entering its code in parentheses:'
 	sessions.each { |s| 
@@ -31,6 +33,19 @@ def select_session(sessions)
 	return session
 end
 
+# Build a list of possible course subjects, return a hash that maps natural keys to their course subject objects
+def build_subject_hash
+	course_subjects = MauiWebService.get_course_subjects
+	cs_hash = Hash.new
+
+	course_subjects.each { |cs|
+		cs_hash[cs.naturalKey] = cs
+	}
+
+	return cs_hash
+end
+
+# Select a subject to find courses in
 def select_course_subject(cs_hash)
 	course_subject = nil
 	done_selecting_cs = false
@@ -53,7 +68,8 @@ def select_course_subject(cs_hash)
 	return course_subject
 end
 
-def select_courses(courses)
+# Select a course within a defined course subject
+def select_courses_in_subject(courses)
 	puts "\nAdd courses one at a time from one of the following course numbers. When you are done adding courses for this subject, enter 'done'"
 	courses.each_with_index { |course, i| 
 		print "#{course}"
@@ -81,37 +97,55 @@ def select_courses(courses)
 
 	return selected_courses
 end
+
+# Facilitate user input of selecting courses for scheduling, return an array of selected courses
+def select_courses(session_code)
+	selected_courses = []
+	done_adding_courses = false
+	cs_hash = build_subject_hash
+
+	until done_adding_courses
+		course_subject = select_course_subject(cs_hash)
+		if course_subject == nil
+			done_adding_courses = true
+		else
+			courses = MauiWebService.get_courses(session_code, course_subject)
+			courses.sort!
+
+			select_courses_in_subject(courses).each { |course_num|
+				selected_courses << {subject: course_subject, course: course_num}
+			}
+		end
+	end
+
+	return selected_courses
+end
+
+# Retrieve a list of sections for each selected course. Each course corresponds to an index in the array,
+# which contains a sub-array of sections
+# TODO - should this be made into a hash with course=key and sections[]=value?
+def get_sections(session_code, selected_courses)
+	sections = []
+	# create array inside array for each group of sections
+	selected_courses.each { |course_hash|
+		sections << MauiWebService.get_complex_sections(session_code, course_hash[:subject], course_hash[:course])
+	}
+
+	return sections
+end
 #------------End Helper Methods-------------
 
 #------------Start Main Script--------------
+
+# Get a list of sessions and select the session for scheduling
 sessions = MauiWebService.get_sessions(2, 3)
-session = select_session(sessions)
+session_code = select_session(sessions)
 
-course_subjects = MauiWebService.get_course_subjects
-cs_hash = Hash.new
-course_subjects.each { |cs|
-	cs_hash[cs.naturalKey] = cs
-}
-
+# Select the courses to look at for scheduling
 puts "\nNow you will build a list of the courses you want to examine."
+selected_courses = select_courses(session_code)
 
-selected_courses = []
-done_adding_courses = false
-
-until done_adding_courses
-	course_subject = select_course_subject(cs_hash)
-	if course_subject == nil
-		done_adding_courses = true
-	else
-		courses = MauiWebService.get_courses(session, course_subject)
-		courses.sort!
-
-		select_courses(courses).each { |course_num|
-			selected_courses << {subject: course_subject, course: course_num}
-		}
-	end
-end
-
+# Print a list of selected courses
 print "\nCourses Selected: "
 selected_courses.each_with_index { |course_hash, i|
 	print "#{course_hash[:subject]}:#{course_hash[:course]}"
@@ -121,24 +155,9 @@ puts puts
 
 puts 'Getting date and time info...'
 
-sections = []
-# create array inside array for each group of sections
-selected_courses.each { |course_hash|
-	sections << MauiWebService.get_complex_sections(session, course_hash[:subject], course_hash[:course])
-}
+sections = get_sections(session_code, select_courses)
+puts sections.length
 
-sections.each { |sectionGroup|
-	sectionGroup.each { |section|
-		puts "\n\nCourse: #{section.subjectCourse} - #{section.courseTitle}"
-		section.timeAndLocations.each { |tal|
-			puts "\n#{tal.to_str}"
-		}
-		section.instructors.each { |inst|
-			puts "\n#{inst.to_str}"
-		}
-	}
-}
-
-#todo get dates/times information
+# todo parse sections in array to model that supports a scheduling algorithm
 
 #------------END OF MAIN SCRIPT-------------------------

@@ -48,18 +48,24 @@ class ComplexSection
 				:additionalTimes, # array
 				:screeningTimes, # array
 				:examTimes, # array
-				:instructors, # array of Instructor(?) objects
+				:instructors, # array of Instructor objects
 				:courseTypes, # array
 				:textBooks, # array of Textbook objects
 				:courseFees,
 				:adminHome,
 				:legacyAdminHome,
 				:generalCatalogText,
+				:requirements,
+				:recommendations,
 				:sectionInfo,
 				:registrationInfo,
 				:mandatoryGroup, # array
 				:mandatoryId,
 				:mandatorySectionNumber,
+				:coexistingSections, # array
+				:legacyCoexistingSections, # array
+				:crossReferences, # array
+				:legacyCrossReferences, # array
 				:preferredGroup, # array
 				:preferredGroupSectionTypes, # array
 				:lastDayToDropOrReduceHoursWithTuitionReduction,
