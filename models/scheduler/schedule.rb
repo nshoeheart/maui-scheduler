@@ -4,14 +4,20 @@ require_relative 'event'
 class Schedule
 	attr_reader(:days)
 
-	def initialize(sch_info) # timeAndLocations object from MAUI
+	def initialize
 		@days = Hash.new
 
 		Day.day_names.each { |d|
 			@days[d] = Day.new(d)
 		}
+	end
 
-		# todo add parsing logic from timeAndLocations object
+	def self.parse_maui_schedule(tal)
+		schedule = Schedule.new
+
+		# todo add parsing logic from timeAndLocations object to Schedule
+
+		return schedule
 	end
 
 	# Check if this Schedule object has any conflicts with another Schedule object 'sch'

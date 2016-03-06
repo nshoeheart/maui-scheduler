@@ -1,8 +1,10 @@
-require_relative 'util/maui_web_service'
 require_relative 'models/maui/course_subject'
 require_relative 'models/maui/session'
 require_relative 'models/maui/complex_section'
 require_relative 'models/maui/instructor'
+
+require_relative 'util/maui_web_service'
+require_relative 'util/section_builder'
 
 #------------------Helper Methods-------------------------
 
@@ -124,15 +126,16 @@ end
 # Retrieve a list of sections for each selected course. Each course corresponds to an index in the array,
 # which contains a sub-array of sections
 # TODO - should this be made into a hash with course=key and sections[]=value?
-def get_sections(session_code, selected_courses)
-	sections = []
+def get_courses(session_code, selected_courses)
+	courses = []
 	# create array inside array for each group of sections
 	selected_courses.each { |course_hash|
-		sections << MauiWebService.get_complex_sections(session_code, course_hash[:subject], course_hash[:course])
+		courses << MauiWebService.get_complex_sections(session_code, course_hash[:subject], course_hash[:course])
 	}
 
-	return sections
+	return courses
 end
+
 #------------End Helper Methods-------------
 
 #------------Start Main Script--------------
@@ -154,10 +157,20 @@ selected_courses.each_with_index { |course_hash, i|
 puts puts
 
 puts 'Getting date and time info...'
+maui_courses = get_courses(session_code, selected_courses)
 
-sections = get_sections(session_code, select_courses)
-puts sections.length
+section_builder = SectionBuilder.new(maui_courses)
+courses = section_builder.courses
 
-# todo parse sections in array to model that supports a scheduling algorithm
+courses.each { |course|
+	puts "\n"
+	puts "#{course.subject}:#{course.course_num} - #{course.course_title}"
+	course.section_groups.each { |group|
+		puts "\tSection Group:"
+		group.sections.each { |section|
+			puts "\t\t#{section.full_section_num} - #{section.section_type}"
+		}
+	}
+}
 
 #------------END OF MAIN SCRIPT-------------------------

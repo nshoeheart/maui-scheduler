@@ -9,9 +9,10 @@ class Day
 	@@fri = :fri
 	@@sat = :sat
 	@@sun = :sun
+	@@day_names = [@@mon, @@tue, @@wed, @@thu, @@fri, @@sat, @@sun]
 
 	def initialize(day_name)
-		if (day_names.includes?(day_name))
+		if (@@day_names.include?(day_name))
 			@day_name = day_name
 		else
 			@day_name = nil #todo - throw error instead?
