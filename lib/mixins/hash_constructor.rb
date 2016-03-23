@@ -5,7 +5,7 @@ module HashConstructor
 				public_send("#{key}=", val)
 			rescue NoMethodError
 				#todo add more organized error logging
-				puts "ERROR: Attempted to call undefined method: \"#{key}=\" with value: \"#{val}\""
+				#puts "ERROR: Attempted to call undefined method: \"#{key}=\" with value: \"#{val}\""
 			end
 		}
 	end

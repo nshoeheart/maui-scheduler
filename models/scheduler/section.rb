@@ -15,8 +15,8 @@ class Section
 		@course_num = course_num
 		@section_num = section_num
 		@section_type = section_type
-		@planner_status = planner_status
 		@schedule = schedule
+		@planner_status = planner_status
 	end
 
 	def full_section_num

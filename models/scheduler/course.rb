@@ -15,8 +15,8 @@ class Course
 		@course_num = course_num
 		@section_groups = []
 	end
-
-	def add_section(maui_id, section_num, section_type, schedule, planner_status, mand_sec_num=nil, mand_group_ids=nil)
+	
+	def add_section(maui_id, section_num, section_type, planner_status, schedule, mand_sec_num=nil, mand_group_ids=nil)
 		section = Section.new(maui_id, @course_title, @subject, @course_num, section_num, section_type, schedule, planner_status)
 		added = false
 

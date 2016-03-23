@@ -10,7 +10,7 @@ require_relative 'util/section_builder'
 
 # Select a session to get courses for
 def select_session(sessions)
-	puts 'Select one of the following semesters by entering its code in parentheses:'
+	puts 'Select one of the following semesters by entering its code (the one in parentheses):'
 	sessions.each { |s| 
 		puts "\t#{s.shortDescription} (#{s.legacyCode})"
 	}
@@ -145,7 +145,7 @@ sessions = MauiWebService.get_sessions(2, 3)
 session_code = select_session(sessions)
 
 # Select the courses to look at for scheduling
-puts "\nNow you will build a list of the courses you want to examine."
+puts "\nNow you will build a list of the courses you want to schedule."
 selected_courses = select_courses(session_code)
 
 # Print a list of selected courses
@@ -165,10 +165,25 @@ courses = section_builder.courses
 courses.each { |course|
 	puts "\n"
 	puts "#{course.subject}:#{course.course_num} - #{course.course_title}"
+
 	course.section_groups.each { |group|
 		puts "\tSection Group:"
+
 		group.sections.each { |section|
 			puts "\t\t#{section.full_section_num} - #{section.section_type}"
+
+			section.schedule.days.each { |day_name, day|
+				print "\t\t\t#{day_name} -> "
+
+				day.events.each_with_index { |event, i|
+					print event.time_and_loc
+					if (i == day.events.length - 1)
+						print "\n"
+					else
+						print ', '
+					end
+				}
+			}
 		}
 	}
 }

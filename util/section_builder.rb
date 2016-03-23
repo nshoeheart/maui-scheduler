@@ -31,7 +31,7 @@ class SectionBuilder
 			section_num = maui_section.sectionNumber
 			section_type = maui_section.sectionType
 			planner_status = maui_section.plannerStatus
-			schedule = Schedule.parse_maui_schedule(maui_section.timeAndLocations[0]) #todo Is there ever more than 1 of these?
+			schedule = Schedule.parse_maui_schedule(maui_section.timeAndLocations, course_num, course_title, section_type)
 			mand_sec_num = maui_section.mandatorySectionNumber
 			mand_sec_group = maui_section.mandatoryGroup
 

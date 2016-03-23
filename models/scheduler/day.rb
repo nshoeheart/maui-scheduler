@@ -1,18 +1,53 @@
 class Day
-	attr_reader(:day,
+	attr_reader(:day_name,
 				:events)
 
-	@@mon = :mon
-	@@tue = :tue
-	@@wed = :wed
-	@@thu = :thu
-	@@fri = :fri
-	@@sat = :sat
-	@@sun = :sun
-	@@day_names = [@@mon, @@tue, @@wed, @@thu, @@fri, @@sat, @@sun]
+	@@sun = 'Sun'
+	@@mon = 'Mon'
+	@@tue = 'Tue'
+	@@wed = 'Wed'
+	@@thu = 'Thu'
+	@@fri = 'Fri'
+	@@sat = 'Sat'
+	@@day_names = [@@sun, @@mon, @@tue, @@wed, @@thu, @@fri, @@sat]
+
+	@@tiny_names = {@@sun => 'Su', @@mon => 'Mo', @@tue => 'Tu', @@wed => 'We', @@thu => 'Th', @@fri => 'Fr', @@sat => 'Sa'}
+	@@long_names = {@@sun => 'Sunday', @@mon => 'Monday', @@tue => 'Tuesday', @@wed => 'Wednesday', @@thu => 'Thursday', @@fri => 'Friday', @@sat => 'Saturday'}
+
+	def self.sun
+		@@sun
+	end
+
+	def self.mon
+		@@mon
+	end
+
+	def self.tue
+		@@tue
+	end
+
+	def self.wed
+		@@wed
+	end
+
+	def self.thu
+		@@thu
+	end
+
+	def self.fri
+		@@fri
+	end
+
+	def self.sat
+		@@sat
+	end
+
+	def self.day_names
+		@@day_names
+	end
 
 	def initialize(day_name)
-		if (@@day_names.include?(day_name))
+		if (Day.day_names.include?(day_name))
 			@day_name = day_name
 		else
 			@day_name = nil #todo - throw error instead?
@@ -50,7 +85,15 @@ class Day
 		@events << event
 	end
 
-	def self.day_names
-		return [@@mon, @@tue, @@wed, @@thu, @@fri, @@sat, @@sun]
+	def tiny_name
+		@@tiny_names[@day_name]
+	end
+
+	def short_name
+		@day_name
+	end
+
+	def long_name
+		@@long_names[@day_name]
 	end
 end

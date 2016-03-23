@@ -1,25 +1,28 @@
-class Event
-	attr_reader(:start_time,
-				:end_time,
-				:course_number,
-				:course_title,
-				:event_type)
+require_relative 'simple_time'
 
-	def initialize(start_time, end_time, course_number, course_title, event_type)
+class Event
+	attr_reader(:course_number,
+				:course_title,
+				:event_type,
+				:start_time,
+				:end_time,
+				:location)
+
+	def initialize(start_time, end_time, course_number, course_title, event_type, location)
 		@start_time = start_time
 		@end_time = end_time
 		@course_number = course_number
 		@course_title = course_title
 		@event_type = event_type
+		@location = location
 	end
 
 	# Check if this Event object conflicts with another Event object 'event'
 	def conflicts_with?(event)
-		# todo improve logic using a Time method if these are Date/Time objects
-		if (((@start_time >= event.start_time) && (@start_time <= event.end_time)) || ((@end_time >= event.start_time) && (@end_time <= event.end_time)))
-			return true
-		end
+		return (((@start_time >= event.start_time) && (@start_time <= event.end_time)) || ((@end_time >= event.start_time) && (@end_time <= event.end_time)))
+	end
 
-		return false
+	def time_and_loc
+		return "#{@start_time.disp_time} - #{@end_time.disp_time} in #{location}"
 	end
 end
