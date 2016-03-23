@@ -25,4 +25,8 @@ class Event
 	def time_and_loc
 		return "#{@start_time.disp_time} - #{@end_time.disp_time} in #{location}"
 	end
+
+	def <=> (other_event)
+		return @start_time <=> other_event.start_time
+	end
 end

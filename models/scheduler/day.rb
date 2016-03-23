@@ -79,6 +79,7 @@ class Day
 		day.events.each { |event|
 			add_event(event)
 		}
+		@events.sort!
 	end
 
 	def add_event(event)

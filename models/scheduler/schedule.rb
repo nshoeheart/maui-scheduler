@@ -47,8 +47,8 @@ class Schedule
 				day.add_event(event)
 
 				if schedule.days.has_key?(day.day_name)
-					temp_day = day.merge(schedule.days[day.day_name])
-					schedule.add_day(temp_day)
+					day.merge(schedule.days[day.day_name])
+					schedule.add_day(day)
 				else
 					schedule.add_day(day)
 				end

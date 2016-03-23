@@ -2,12 +2,17 @@ class SimpleTime
 	attr_reader :disp_time, :comp_time
 
 	def initialize(time_str)
-		time_str = time_str.downcase
-		
-		if (time_str.end_with?('a') || time_str.end_with?('p'))
-			@time = parse_12hr_time(time_str)
+		if time_str != nil
+			time_str = time_str.downcase
+			
+			if (time_str.end_with?('a') || time_str.end_with?('p'))
+				parse_12hr_time(time_str)
+			else
+				parse_24hr_time(time_str)
+			end
 		else
-			@time = parse_24hr_time(time_str)
+			@disp_time = 'N/A'
+			@comp_time = -1
 		end
 	end
 
@@ -27,6 +32,7 @@ class SimpleTime
 			@comp_time = hours*60 + mins
 		end
 	end
+	private :parse_12hr_time
 
 	def parse_24hr_time(time_str)
 		hours = time.split(':')[0].to_i
@@ -41,6 +47,7 @@ class SimpleTime
 			@disp_time = "#{hours}:#{mins} AM"
 		end
 	end
+	private :parse_24hr_time
 
 	def > time
 		return (@comp_time > time.comp_time)
@@ -60,5 +67,11 @@ class SimpleTime
 
 	def <= time
 		return !(self > time)
+	end
+
+	def <=> time
+		return -1 if self < time
+		return 0 if self == time
+		return 1 if self > time
 	end
 end
