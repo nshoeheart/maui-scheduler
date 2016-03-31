@@ -30,8 +30,9 @@ class SectionBuilder
 			section_maui_id = maui_section.sectionId
 			section_num = maui_section.sectionNumber
 			section_type = maui_section.sectionType
+			full_course_num = "#{subject}:#{course_num}:#{section_num}"
 			planner_status = maui_section.plannerStatus
-			schedule = Schedule.parse_maui_schedule(maui_section.timeAndLocations, course_num, course_title, section_type)
+			schedule = Schedule.parse_maui_schedule(maui_section.timeAndLocations, full_course_num, course_title, section_type)
 			mand_sec_num = maui_section.mandatorySectionNumber
 			mand_sec_group = maui_section.mandatoryGroup
 

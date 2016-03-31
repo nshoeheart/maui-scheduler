@@ -61,4 +61,23 @@ class SectionGroup
 
 		return associated_sections
 	end
+
+	def get_possible_schedules
+		schedules = []
+
+		if @mand_sec_num == nil
+			@sections.each { |sec|
+				schedules << sec.schedule
+			}
+		else
+			mand_sec = get_mandatory_section
+
+			get_associated_sections.each { |asec|
+				asec.schedule.merge(mand_sec.schedule)
+				schedules << asec.schedule
+			}
+		end
+
+		return schedules
+	end
 end

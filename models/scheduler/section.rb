@@ -6,7 +6,7 @@ class Section
 				:section_num,
 				:section_type, # lecture, discussion, lab, etc. (enum?)
 				:planner_status, # make sure it is an approved section
-				:schedule) # split out into separate model
+				:schedule) # Schedule object
 
 	def initialize(maui_id, course_title, subject, course_num, section_num, section_type, schedule, planner_status)
 		@maui_id = maui_id

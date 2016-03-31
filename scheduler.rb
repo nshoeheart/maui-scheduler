@@ -2,9 +2,11 @@ require_relative 'models/maui/course_subject'
 require_relative 'models/maui/session'
 require_relative 'models/maui/complex_section'
 require_relative 'models/maui/instructor'
+require_relative 'models/scheduler/schedule'
 
 require_relative 'util/maui_web_service'
 require_relative 'util/section_builder'
+require_relative 'util/schedule_generator'
 
 #------------------Helper Methods-------------------------
 
@@ -136,6 +138,34 @@ def get_courses(session_code, selected_courses)
 	return courses
 end
 
+def print_courses(courses)
+	courses.each { |course|
+		puts "\n"
+		puts "#{course.subject}:#{course.course_num} - #{course.course_title}"
+
+		course.section_groups.each { |group|
+			puts "\tSection Group:"
+
+			group.sections.each { |section|
+				puts "\t\t#{section.full_section_num} - #{section.section_type}"
+
+				section.schedule.days.each { |day_name, day|
+					print "\t\t\t#{day_name} -> "
+
+					day.events.each_with_index { |event, i|
+						print event.time_and_loc
+						if (i == day.events.length - 1)
+							print "\n"
+						else
+							print ', '
+						end
+					}
+				}
+			}
+		}
+	}
+end
+
 #------------End Helper Methods-------------
 
 #------------Start Main Script--------------
@@ -162,30 +192,13 @@ maui_courses = get_courses(session_code, selected_courses)
 section_builder = SectionBuilder.new(maui_courses)
 courses = section_builder.courses
 
-courses.each { |course|
-	puts "\n"
-	puts "#{course.subject}:#{course.course_num} - #{course.course_title}"
-
-	course.section_groups.each { |group|
-		puts "\tSection Group:"
-
-		group.sections.each { |section|
-			puts "\t\t#{section.full_section_num} - #{section.section_type}"
-
-			section.schedule.days.each { |day_name, day|
-				print "\t\t\t#{day_name} -> "
-
-				day.events.each_with_index { |event, i|
-					print event.time_and_loc
-					if (i == day.events.length - 1)
-						print "\n"
-					else
-						print ', '
-					end
-				}
-			}
-		}
-	}
+schedule_generator = ScheduleGenerator.new(courses)
+schedule_generator.possible_schedules.each_with_index { |sch, i|
+	puts "POSSIBLE SCHEDULE \##{i + 1}:\n#{"-" * (13 + i)}"
+	sch.print
+	puts "\n" unless i == schedule_generator.possible_schedules.length - 1
 }
+
+
 
 #------------END OF MAIN SCRIPT-------------------------

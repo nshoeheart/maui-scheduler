@@ -10,7 +10,7 @@ class Schedule
 		@days = Hash.new
 	end
 
-	def self.parse_maui_schedule(times_and_locations, course_num, course_title, event_type) # array of timeAndLocations objects
+	def self.parse_maui_schedule(times_and_locations, full_course_num, course_title, event_type) # array of timeAndLocations objects
 		schedule = Schedule.new
 
 		times_and_locations.each { |tal|
@@ -19,7 +19,7 @@ class Schedule
 			start_time = SimpleTime.new(tal.startTime)
 			end_time = SimpleTime.new(tal.endTime)
 			location = "#{tal.room} #{tal.building}"
-			event = Event.new(start_time, end_time, course_num, course_title, event_type, location)
+			event = Event.new(start_time, end_time, full_course_num, course_title, event_type, location)
 
 			if tal.sun
 				days << Day.new(Day.sun)
@@ -46,8 +46,8 @@ class Schedule
 			days.each { |day|
 				day.add_event(event)
 
-				if schedule.days.has_key?(day.day_name)
-					day.merge(schedule.days[day.day_name])
+				if schedule.days.has_key?(day.day_key)
+					day.merge(schedule.days[day.day_key])
 					schedule.add_day(day)
 				else
 					schedule.add_day(day)
@@ -59,14 +59,15 @@ class Schedule
 	end
 
 	def add_day(day)
-		@days[day.day_name] = day
+		@days[day.day_key] = day
+		@days = @days.sort.to_h
 	end
 
 	# Check if this Schedule object has any conflicts with another Schedule object 'sch'
 	def conflicts_with?(sch)
-		Day.day_names.each { |day_name|
-			if @days.has_key?(day_name) && sch.days.has_key?(day_name)
-				if (@days[day_name].conflicts_with? sch.days[day_name])
+		Day.day_keys.each { |day_key|
+			if @days.has_key?(day_key) && sch.days.has_key?(day_key)
+				if (@days[day_key].conflicts_with? sch.days[day_key])
 					return true
 				end
 			end
@@ -78,12 +79,36 @@ class Schedule
 	# Merge another Schedule object into this one
 	# To avoid overlapping events, make sure that conflicts_with?(sch) returns false
 	def merge(sch)
-		sch.days.each { |day|
-			if (@days.has_key?(day.day_name))
-				@days[day.day_name].merge(day)
+		sch.days.each { |day_key, day|
+			if (@days.has_key?(day_key))
+				@days[day_key].merge(day)
 			else
-				@days[day.day_name] = day
+				@days[day_key] = day
+				@days = @days.sort.to_h
 			end
+		}
+
+		return nil
+	end
+
+	def clone
+		sch_clone = Schedule.new
+
+		@days.each { |day_key, day|
+			day_clone = day.clone
+			sch_clone.add_day(day_clone)
+		}
+
+		return sch_clone
+	end
+
+	def print
+		@days.each { |day_key, day|
+			puts "#{day.long_name}:"
+
+			day.events.each { |event|
+				puts "\t#{event.to_str}"
+			}
 		}
 	end
 end

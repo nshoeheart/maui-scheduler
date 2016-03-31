@@ -1,17 +1,18 @@
 class Day
-	attr_reader(:day_name,
+	attr_reader(:day_key,
 				:events)
 
-	@@sun = 'Sun'
-	@@mon = 'Mon'
-	@@tue = 'Tue'
-	@@wed = 'Wed'
-	@@thu = 'Thu'
-	@@fri = 'Fri'
-	@@sat = 'Sat'
-	@@day_names = [@@sun, @@mon, @@tue, @@wed, @@thu, @@fri, @@sat]
+	@@sun = 0
+	@@mon = 1
+	@@tue = 2
+	@@wed = 3
+	@@thu = 4
+	@@fri = 5
+	@@sat = 6
+	@@day_keys = [@@sun, @@mon, @@tue, @@wed, @@thu, @@fri, @@sat]
 
 	@@tiny_names = {@@sun => 'Su', @@mon => 'Mo', @@tue => 'Tu', @@wed => 'We', @@thu => 'Th', @@fri => 'Fr', @@sat => 'Sa'}
+	@@short_names = {@@sun => 'Sun', @@mon => 'Mon', @@tue => 'Tue', @@wed => 'Wed', @@thu => 'Thu', @@fri => 'Fri', @@sat => 'Sat'}
 	@@long_names = {@@sun => 'Sunday', @@mon => 'Monday', @@tue => 'Tuesday', @@wed => 'Wednesday', @@thu => 'Thursday', @@fri => 'Friday', @@sat => 'Saturday'}
 
 	def self.sun
@@ -42,15 +43,15 @@ class Day
 		@@sat
 	end
 
-	def self.day_names
-		@@day_names
+	def self.day_keys
+		@@day_keys
 	end
 
-	def initialize(day_name)
-		if (Day.day_names.include?(day_name))
-			@day_name = day_name
+	def initialize(day_key)
+		if (Day.day_keys.include?(day_key))
+			@day_key = day_key
 		else
-			@day_name = nil #todo - throw error instead?
+			@day_key = nil #todo - throw error instead?
 		end
 
 		@events = []
@@ -82,19 +83,31 @@ class Day
 		@events.sort!
 	end
 
+	def clone
+		day_clone = Day.new(@day_key)
+
+		@events.each { |event|
+			event_clone = event.clone
+			day_clone.add_event(event_clone)
+		}
+
+		return day_clone
+	end
+
 	def add_event(event)
 		@events << event
+		@events.sort!
 	end
 
 	def tiny_name
-		@@tiny_names[@day_name]
+		@@tiny_names[@day_key]
 	end
 
 	def short_name
-		@day_name
+		@@short_names[@day_key]
 	end
 
 	def long_name
-		@@long_names[@day_name]
+		@@long_names[@day_key]
 	end
 end

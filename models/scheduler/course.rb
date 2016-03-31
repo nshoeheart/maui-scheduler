@@ -6,7 +6,7 @@ class Course
 				:course_title,
 				:subject,
 				:course_num,
-				:section_groups)
+				:section_groups) # array of SectionGroup objects
 
 	def initialize(maui_id, course_title, subject, course_num)
 		@maui_id = maui_id
@@ -38,5 +38,17 @@ class Course
 			group.add_section(section)
 			@section_groups << group
 		end
+	end
+
+	def get_possible_schedules
+		schedules = []
+
+		@section_groups.each { |sg|
+			sg.get_possible_schedules.each { |schedule|
+				schedules << schedule
+			}
+		}
+
+		return schedules
 	end
 end
