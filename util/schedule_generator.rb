@@ -22,13 +22,14 @@ class ScheduleGenerator
 					@possible_schedules.each { |poss_sch|
 						if !poss_sch.conflicts_with? new_sch
 							temp_sch = poss_sch.clone
-							new_sch.merge(temp_sch)
-							schedules << new_sch
+							temp_sch.merge(new_sch.clone)
+							schedules << temp_sch
 						end
 					}
 				}
 
 				@possible_schedules = schedules
+				schedules = []
 			}
 		end
 	end

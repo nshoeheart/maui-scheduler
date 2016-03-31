@@ -193,11 +193,16 @@ section_builder = SectionBuilder.new(maui_courses)
 courses = section_builder.courses
 
 schedule_generator = ScheduleGenerator.new(courses)
-schedule_generator.possible_schedules.each_with_index { |sch, i|
-	puts "POSSIBLE SCHEDULE \##{i + 1}:\n#{"-" * (13 + i)}"
-	sch.print
-	puts "\n" unless i == schedule_generator.possible_schedules.length - 1
-}
+
+if schedule_generator.possible_schedules.any?
+	schedule_generator.possible_schedules.each_with_index { |sch, i|
+		puts "POSSIBLE SCHEDULE \##{i + 1}:\n#{"-" * (21 + i/10)}"
+		sch.print
+		puts "\n" unless i == schedule_generator.possible_schedules.length - 1
+	}
+else
+	puts "No possbible schedule combinations found for this set of courses."	
+end
 
 
 
