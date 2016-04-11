@@ -2,9 +2,19 @@ require_relative '../models/maui/complex_section'
 require_relative '../models/scheduler/course'
 require_relative '../models/scheduler/schedule'
 
+#
+# Class SectionBuilder provides a utility to convert a set of courses obtained from MAUI and parse its data format into one that is convenient for this scheduling application. Takes care of fully building Section objects and assigning them to the correct SectionGroup within each Course.
+#
+# @author Nathan Schuchert <nathan@shoeheart.com>
+#
 class SectionBuilder
 	attr_reader(:maui_courses, :courses)
 
+	#
+	# Create a new instance of SectionBuilder and convert the provided MAUI Courses into Course objects that fit this application.
+	#
+	# @param [Array<MauiCourse>] maui_courses list of MauiCourse objects that will be converted into Course objects
+	#
 	def initialize(maui_courses)
 		@maui_courses = maui_courses
 		@courses = []
@@ -14,6 +24,11 @@ class SectionBuilder
 		}
 	end
 
+	#
+	# Build a Course object and populate all its attributes from the provided MauiCourse
+	#
+	# @param [MauiCourse] maui_course object containing course data as in the format that MAUI provides
+	#
 	def build_course(maui_course)
 		course = nil
 
@@ -41,4 +56,5 @@ class SectionBuilder
 
 		@courses << course
 	end
+	private :build_course
 end

@@ -8,12 +8,20 @@ require_relative 'util/maui_web_service'
 require_relative 'util/section_builder'
 require_relative 'util/schedule_generator'
 
+# Main script used to run maui-scheduler application
+
 #------------------Helper Methods-------------------------
 
-# Select a session to get courses for
+#
+# Script to select a session to get courses for
+#
+# @param [Array<Session>] sessions List of Session objects retrieved from MAUI
+#
+# @return [Session] The Session object that was selected
+#
 def select_session(sessions)
 	puts 'Select one of the following semesters by entering its code (the one in parentheses):'
-	sessions.each { |s| 
+	sessions.each { |s|
 		puts "\t#{s.shortDescription} (#{s.legacyCode})"
 	}
 
@@ -37,7 +45,12 @@ def select_session(sessions)
 	return session
 end
 
-# Build a list of possible course subjects, return a hash that maps natural keys to their course subject objects
+#
+# Build a list of possible course subjects and populate a hash mapping subject natural keys to their CourseSubject objects
+#
+#
+# @return [Hash{String => CourseSubject}] Hash of CourseSubjects keyed by their natural keys (e.g. CBE, ECON, RHET, etc.)
+#
 def build_subject_hash
 	course_subjects = MauiWebService.get_course_subjects
 	cs_hash = Hash.new
@@ -49,7 +62,13 @@ def build_subject_hash
 	return cs_hash
 end
 
-# Select a subject to find courses in
+#
+# Select a subject (such as CBE, ENGR, CS, etc.) for which to retrieve a list of course numbers for the given semester
+#
+# @param [Hash{String => CourseSubject}] cs_hash Hash of CourseSubjects keyed by their natural keys (e.g. CBE, ECON, RHET, etc.)
+#
+# @return [CourseSubject] The CourseSubject object for which to retrieve a list of course numbers from MAUI
+#
 def select_course_subject(cs_hash)
 	course_subject = nil
 	done_selecting_cs = false
@@ -72,10 +91,16 @@ def select_course_subject(cs_hash)
 	return course_subject
 end
 
-# Select a course within a defined course subject
+#
+# Repeating script to select multiple course numbers for which to retrieve scheduling information
+#
+# @param [Array<Integer>] courses a list of course numbers within a given course subject that represent valid courses within that subject
+#
+# @return [Array<Integer>] A selected subset of the provided course numbers for which to get scheduling information from MAUI
+#
 def select_courses_in_subject(courses)
 	puts "\nAdd courses one at a time from one of the following course numbers. When you are done adding courses for this subject, enter 'done'"
-	courses.each_with_index { |course, i| 
+	courses.each_with_index { |course, i|
 		print "#{course}"
 		print ', ' unless i == courses.length - 1
 	}
@@ -102,7 +127,13 @@ def select_courses_in_subject(courses)
 	return selected_courses
 end
 
-# Facilitate user input of selecting courses for scheduling, return an array of selected courses
+#
+# Script to facilitate user input of selecting courses to be scheduled
+#
+# @param [String] session_code Legacy session code such as '20133' representing a session in MAUI
+#
+# @return [Array<Hash{:subject => CourseSubject, :course => Integer}>] List of hashes to organize each selected course's data into a CourseSubject object keyed on :subject and a course number keyed on :course
+#
 def select_courses(session_code)
 	selected_courses = []
 	done_adding_courses = false
@@ -128,6 +159,15 @@ end
 # Retrieve a list of sections for each selected course. Each course corresponds to an index in the array,
 # which contains a sub-array of sections
 # TODO - should this be made into a hash with course=key and sections[]=value?
+
+#
+# Retrieve a list of sections from MAUI for each selected course
+#
+# @param [String] session_code Legacy session code such as '20133' representing a session in MAUI
+# @param [Array<Hash{:subject => CourseSubject, :course => Integer}>] selected_courses List of hashes to organize each selected course's data into a CourseSubject object keyed on :subject and a course number keyed on :course
+#
+# @return [Array<Array<ComplexSection>>] Array of Arrays of ComplexSection objects obtained from MAUI for each selected course that contain all necessary section information for scheduling
+#
 def get_courses(session_code, selected_courses)
 	courses = []
 	# create array inside array for each group of sections
@@ -138,6 +178,11 @@ def get_courses(session_code, selected_courses)
 	return courses
 end
 
+#
+# Print the available options for enrollment in each of the provided courses
+#
+# @param [Array<Course>] courses Array of Course objects for which to print scheduling options
+#
 def print_courses(courses)
 	courses.each { |course|
 		puts "\n"
@@ -149,8 +194,8 @@ def print_courses(courses)
 			group.sections.each { |section|
 				puts "\t\t#{section.full_section_num} - #{section.section_type}"
 
-				section.schedule.days.each { |day_name, day|
-					print "\t\t\t#{day_name} -> "
+				section.schedule.days.each { |day_key, day|
+					print "\t\t\t#{day.short_name} -> "
 
 					day.events.each_with_index { |event, i|
 						print event.time_and_loc
@@ -164,6 +209,27 @@ def print_courses(courses)
 			}
 		}
 	}
+
+	return nil
+end
+
+#
+# Print the list of possible schedule combinations that were computed
+#
+# @param [Array<Schedule>] possible_schedules List of all possible schedule combinations containing all selected courses
+#
+def print_schedules(possible_schedules)
+	if possible_schedules.any?
+		possible_schedules.each_with_index { |sch, i|
+			puts "POSSIBLE SCHEDULE \##{i + 1}:\n#{"-" * 23}"
+			sch.print
+			puts "\n" unless i == possible_schedules.length - 1
+		}
+	else
+		puts "No possbible schedule combinations found for this set of courses."
+	end
+
+	return nil
 end
 
 #------------End Helper Methods-------------
@@ -186,24 +252,20 @@ selected_courses.each_with_index { |course_hash, i|
 }
 puts puts
 
+# Get course information including dates and times offered from MAUI that will be used for creating schedules
 puts 'Getting date and time info...'
 maui_courses = get_courses(session_code, selected_courses)
 
+# Convert the data retrieved from MAUI into the data format that will be used for examining possible schedule options
 section_builder = SectionBuilder.new(maui_courses)
 courses = section_builder.courses
+print_courses(courses)
 
+puts puts
+
+# Generate a list of all possible schedules that allow enrollment in all selected courses without a timing conflict, and print them
 schedule_generator = ScheduleGenerator.new(courses)
-
-if schedule_generator.possible_schedules.any?
-	schedule_generator.possible_schedules.each_with_index { |sch, i|
-		puts "POSSIBLE SCHEDULE \##{i + 1}:\n#{"-" * (21 + i/10)}"
-		sch.print
-		puts "\n" unless i == schedule_generator.possible_schedules.length - 1
-	}
-else
-	puts "No possbible schedule combinations found for this set of courses."	
-end
-
+print_schedules(schedule_generator.possible_schedules)
 
 
 #------------END OF MAIN SCRIPT-------------------------

@@ -1,5 +1,10 @@
 require_relative '../../lib/mixins/hash_constructor'
 
+#
+# Class ComplexSection provides Model to hold MAUI data on Sections that were retrieved using the parameter complex=true. Not all values returned from MAUI are necessarily represented in this class' attributes.
+#
+# @author Nathan Schuchert <nathan@shoeheart.com>
+#
 class ComplexSection
 	attr_accessor(:courseId,
 				:courseTitle,
@@ -77,6 +82,11 @@ class ComplexSection
 
 	include HashConstructor
 
+	#
+	# Class TimeAndLocation provides Model to hold time and location data for sections retreived from MAUI
+	#
+	# @author Nathan Schuchert <nathan@shoeheart.com>
+	#
 	class TimeAndLocation
 		attr_accessor(:id,
 					:sortOrder,
@@ -101,6 +111,12 @@ class ComplexSection
 
 		include HashConstructor
 
+		#
+		# Simple to_str method used for debugging.
+		#
+		#
+		# @return [String] String representation of this TimeAndLocation object
+		#
 		def to_str
 			return ("id = #{id}\n" +
 					"sortOrder = #{sortOrder}\n" +

@@ -1,5 +1,10 @@
 require_relative '../../lib/mixins/hash_constructor'
 
+#
+# Class CourseSubject provides Model to store MAUI data about a CourseSubject object, which reprents a course type such as CBE, ECON, CS, etc.
+#
+# @author Nathan Schuchert <nathan@shoeheart.com>
+#
 class CourseSubject
 	attr_accessor(:id,
 				:naturalKey,
@@ -14,6 +19,12 @@ class CourseSubject
 
 	include HashConstructor
 
+	#
+	# Simple to_str method to print this object for debugging.
+	#
+	#
+	# @return [String] String representation of this object
+	#
 	def to_str
 		return ("Course Subject:\n" +
 				"ID = #{id}\n" +

@@ -3,13 +3,31 @@ require_relative 'event'
 require_relative 'simple_time'
 require_relative '../maui/complex_section'
 
+#
+# Class Schedule provides container for organizing a weekly-repeating schedule. Organized by a set of up to 7 days, each of which containing a list of events for that day.
+#
+# @author Nathan Schuchert <nathan@shoeheart.com>
+#
 class Schedule
 	attr_reader(:days)
 
+	#
+	# Create a new instance of Schedule. Adding days and events are taken care of separately.
+	#
 	def initialize
 		@days = Hash.new
 	end
 
+	#
+	# Parse a TimeAndLocations object from UIowa's MAUI webservices into a new Schedule instance along with some other descriptive information.
+	#
+	# @param [ComplexSection::TimeAndLocation] times_and_locations TimeAndLocation object contained within a ComplexSection received from MAUI - contains all necessary scheduling information
+	# @param [String] full_course_num Full course number for a section, formatted like: SUBJ:CRSN:SECN
+	# @param [String] course_title Title or name of the course whose TimeAndLocation data was passed
+	# @param [String] event_type Type of the event whose TimeAndLocation data was passed, such as LECTURE, DISCUSSION, or STANDALONE
+	#
+	# @return [Schedule] New instance of Schedule populated with Days containing Events according to the information passed in times_and_locations
+	#
 	def self.parse_maui_schedule(times_and_locations, full_course_num, course_title, event_type) # array of timeAndLocations objects
 		schedule = Schedule.new
 
@@ -58,12 +76,27 @@ class Schedule
 		return schedule
 	end
 
+	#
+	# Add a new Day object to this Schedule instance. If there is already a Day at @days[day.day_key], it will be replaced by the Day provided.
+	#
+	# @param [Day] day Day object to be placed in @days[day.day_key]
+	#
+	# @return [Schedule] updated instance of this Schedule
+	#
 	def add_day(day)
 		@days[day.day_key] = day
 		@days = @days.sort.to_h
+
+		return self
 	end
 
-	# Check if this Schedule object has any conflicts with another Schedule object 'sch'
+	#
+	# Check if this Schedule object has any event conflicts with the provided Schedule object
+	#
+	# @param [Schedule] sch Other Schedule instance on which to check for event conflicts with this Schedule
+	#
+	# @return [Boolean] Whether or not the provided Schedule has any event conflicts with this Schedule
+	#
 	def conflicts_with?(sch)
 		Day.day_keys.each { |day_key|
 			if @days.has_key?(day_key) && sch.days.has_key?(day_key)
@@ -76,8 +109,13 @@ class Schedule
 		return false
 	end
 
-	# Merge another Schedule object into this one
-	# To avoid overlapping events, make sure that conflicts_with?(sch) returns false
+	#
+	# Merge the Days and Events of another Schedule object into this Schedule. To avoid overlapping events, make sure that self.conflicts_with?(sch) returns false before merging.
+	#
+	# @param [Schedule] sch Other instance of Schedule to merge into this instance
+	#
+	# @return [Schedule] Updated instance of this Schedule
+	#
 	def merge(sch)
 		sch.days.each { |day_key, day|
 			if (@days.has_key?(day_key))
@@ -88,9 +126,15 @@ class Schedule
 			end
 		}
 
-		return nil
+		return self
 	end
 
+	#
+	# Create an identical instance of this Schedule that is independent in memory
+	#
+	#
+	# @return [Schedule] An memory-independent/unreferenced clone of this Schedule
+	#
 	def clone
 		sch_clone = Schedule.new
 
@@ -102,6 +146,9 @@ class Schedule
 		return sch_clone
 	end
 
+	#
+	# Print out a basic text representation of this schedule, organized by each day.
+	#
 	def print
 		@days.each { |day_key, day|
 			puts "#{day.long_name}:"
@@ -110,5 +157,7 @@ class Schedule
 				puts "\t#{event.to_str}"
 			}
 		}
+
+		return nil
 	end
 end
